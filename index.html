@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Где заканчиваюсь «Я»?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1E1E24;
+            --text-main: #E0E0E0;
+            --text-muted: #A0A0A0;
+            --accent: #6C63FF;
+            --accent-hover: #5a52d9;
+        }
+        
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Progress Bar */
+        .progress-wrapper {
+            width: 100%;
+            height: 4px;
+            background-color: var(--card-bg);
+            border-radius: 2px;
+            margin-bottom: 24px;
+            display: none; /* Скрыт на главном экране */
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: var(--accent);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            flex-direction: column;
+            animation: fadeIn 0.4s ease;
+        }
+        .screen.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1, h2 { margin-top: 0; line-height: 1.3; }
+        h1 { font-size: 24px; font-weight: 700; margin-bottom: 16px; }
+        h2 { font-size: 20px; font-weight: 600; margin-bottom: 24px; }
+        p { color: var(--text-muted); line-height: 1.6; font-size: 15px; margin-bottom: 20px; }
+
+        /* Images */
+        .q-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            background-color: var(--card-bg); /* Заглушка, если картинка не загрузилась */
+        }
+
+        /* Buttons & Cards */
+        .btn-main {
+            background-color: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.2s;
+            width: 100%;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-main:hover { background-color: var(--accent-hover); }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--accent);
+            color: var(--text-main);
+            margin-top: 12px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        .card:hover, .card.selected {
+            border-color: var(--accent);
+            background-color: rgba(108, 99, 255, 0.1);
+        }
+
+        /* Loader */
+        .loader-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            margin-top: 50px;
+        }
+        .loader {
+            border: 4px solid var(--card-bg);
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 24px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Results formatting */
+        .result-block {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .result-block h3 { margin-top: 0; font-size: 18px; color: #fff; margin-bottom: 12px;}
+        .result-block p { color: var(--text-main); margin-bottom: 12px; }
+        .science-fact { font-size: 14px; color: var(--text-muted); border-left: 3px solid var(--accent); padding-left: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="progress-wrapper" id="progressWrapper">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div id="screen-intro" class="screen active">
+        <h1>Где заканчиваюсь «Я» и начинается мое состояние?</h1>
+        <p>Интерактивный компас из 7 вопросов, который поможет отделить ваш настоящий характер от влияния нейробиологии.</p>
+        <p>Знакомо ли вам это чувство? Когда после сильного эмоционального спада или внезапного подъема вы смотрите на свои поступки и внутри возникает пугающий вопрос: <i>«Это действительно был я? Или болезнь снова взяла управление на себя?»</i></p>
+        <p>Ваше базовое «Я» никуда не исчезает — мозг просто временно блокирует к нему доступ.</p>
+        <p>Ответьте на 7 вопросов о том, как вы обрабатываете информацию прямо сейчас. В конце вы получите персональную карту своей идентичности.</p>
+        <button class="btn-main" onclick="startQuiz()">Найти свои границы</button>
+    </div>
+
+    <div id="quiz-container"></div>
+
+    <div id="screen-loading" class="screen">
+        <div class="loader-container">
+            <div class="loader"></div>
+            <h2>Анализируем маркеры...</h2>
+            <p>Формируем вашу карту состояний</p>
+        </div>
+    </div>
+
+    <div id="screen-results" class="screen">
+        <h1>Ваша карта состояний</h1>
+        <p>Разделение «себя» и «состояния» — это не вопрос силы воли. Это вопрос знания того, как ваш мозг работает прямо сейчас. Вот ваша картина по трем ключевым осям:</p>
+        
+        <div id="results-content"></div>
+
+        <div style="margin-top: 32px;">
+            <h2>Что делать с этими данными дальше?</h2>
+            <p>Опираться только на самоощущение при перепадах настроения — опасно, мозг умеет виртуозно обманывать сам себя. Чтобы перестать быть заложником своих состояний, нужны внешние опоры.</p>
+            <a href="https://instagram.com/ВАШ_ПРОФИЛЬ" target="_blank" class="btn-main">Подписаться в Instagram и забрать гайд</a>
+            <a href="https://t.me/ВАШ_КОНТАКТ" target="_blank" class="btn-main btn-outline">Записаться на диагностику</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            image: 'images/q1.webp',
+            text: 'Бывают ли у вас периоды резкого подъема, когда вы думаете: «Ну наконец-то туман рассеялся! Вот теперь я на 100% настоящий(ая)»?',
+            options: [
+                { value: 'A', text: 'Да, и в такие моменты всё вокруг кажется кристально ясным, я принимаю самые важные решения.' },
+                { value: 'B', text: 'Я так давно не чувствовал(а) себя «настоящим(ей)», что кажется, будто от меня прежнего(ей) осталась только тень.' },
+                { value: 'C', text: 'Бывают, но я научился(лась) относиться к такой эйфории с осторожностью — часто это просто временный всплеск.' }
+            ]
+        },
+        {
+            image: 'images/q2.webp',
+            text: 'Представьте, что два близких человека говорят вам: «Ты в последнее время ведешь себя странно, это на тебя не похоже». Ваша первая реакция?',
+            options: [
+                { value: 'A', text: 'Острое раздражение. Они просто мыслят медленно или пытаются ограничить мою свободу.' },
+                { value: 'B', text: 'Вина и желание закрыться. У меня просто нет сил что-то объяснять, хочется изолироваться.' },
+                { value: 'C', text: 'Внутренняя пауза. Даже если это неприятно слышать, я допускаю мысль, что со стороны виднее.' }
+            ]
+        },
+        {
+            image: 'images/q3.webp',
+            text: 'Как ваш мозг прямо сейчас обрабатывает новые амбициозные идеи и планы?',
+            options: [
+                { value: 'A', text: 'Идей море, всё нужно сделать немедленно. Если отложу — упущу критически важный шанс.' },
+                { value: 'B', text: 'Любые планы кажутся бессмысленным грузом. Я не вижу в них ценности.' },
+                { value: 'C', text: 'Идеи есть, но они соразмерны силам. Я могу отложить задачу без ощущения катастрофы.' }
+            ]
+        },
+        {
+            image: 'images/q4.webp',
+            text: 'Когда вы оглядываетесь на свои решения, принятые пару месяцев назад, что вы чувствуете?',
+            options: [
+                { value: 'A', text: 'Кажется, что это был вообще другой человек. Старые рамки мне сейчас малы.' },
+                { value: 'B', text: 'Я помню факты, но эмоционально оторван(а). Как будто читаю книгу про чужую жизнь.' },
+                { value: 'C', text: 'Я понимаю свои тогдашние мотивы. Настроение изменилось, но это всё еще я.' }
+            ]
+        },
+        {
+            image: 'images/q5.webp',
+            text: 'Если посмотреть на ваш сон и уровень энергии объективно, что происходит в последние дни?',
+            options: [
+                { value: 'A', text: 'Сплю очень мало, но энергии хоть отбавляй. Кажется, отдых просто не нужен.' },
+                { value: 'B', text: 'Могу спать по 10-12 часов (или мучаюсь от бессонницы), но постоянно чувствую себя разбитым(ой).' },
+                { value: 'C', text: 'Мой сон плюс-минус стабилен, а количество энергии соответствует тому, сколько я отдыхаю.' }
+            ]
+        },
+        {
+            image: 'images/q6.webp',
+            text: 'Как вы сейчас оцениваете риски (в деньгах, отношениях, спонтанных поступках)?',
+            options: [
+                { value: 'A', text: 'Риск меня заводит. У меня есть абсолютная уверенность, что я всё контролирую.' },
+                { value: 'B', text: 'Я избегаю малейших рисков и новых шагов, заранее уверен(а) в полном провале.' },
+                { value: 'C', text: 'Я взвешиваю возможные последствия и допускаю, что могу ошибиться или понести потери.' }
+            ]
+        },
+        {
+            image: 'images/q7.webp',
+            text: 'Если сравнить ваши сегодняшние порывы с теми глубинными ценностями, которые вы разделяли годами:',
+            options: [
+                { value: 'A', text: 'Хочется перечеркнуть старые правила. Мои прежние ценности только связывают мне руки.' },
+                { value: 'B', text: 'Мои ценности остались в прошлом. Сейчас внутри пустота, ни до чего нет дела.' },
+                { value: 'C', text: 'Мои базовые ценности остались теми же, даже если сейчас мне физически трудно им следовать.' }
+            ]
+        }
+    ];
+
+    const resultTexts = {
+        axis1: {
+            title: "Ось 1: Контакт с реальностью (Способность сомневаться)",
+            A: { status: "Сейчас вы склонны на 100% сливаться со своими идеями. Критика вызывает отторжение, а мысли кажутся абсолютно истинными.", science: "В нейробиологии это называется снижением когнитивного инсайта. Ощущение «идеальной ясности ума» часто продиктовано изменением работы лобных долей мозга. Болезнь хитра — она выдает свои импульсы за ваши озарения." },
+            B: { status: "Внешние запросы или критика вызывают у вас желание изолироваться. Вы склонны винить себя и не доверяете своему восприятию.", science: "При сильном спаде мозг переходит в режим сохранения энергии. Гиперрефлексия блокирует способность объективно оценивать реальность. Механизм здравого смысла временно «обесточен»." },
+            C: { status: "У вас сохранен высокий уровень когнитивной гибкости. Вы способны сделать шаг назад и допустить: «Возможно, я ошибаюсь».", science: "Способность наблюдать за своими мыслями со стороны (метапознание) — главный маркер стабильного состояния. Ваш внутренний «наблюдатель» отлично работает." }
+        },
+        axis2: {
+            title: "Ось 2: Дофаминовая система (Энергия и цели)",
+            A: { status: "Ваша система мотивации работает на экстремальных оборотах. Вы готовы рисковать, идей море, а потребность во сне минимальна.", science: "Это эффект гиперчувствительности системы вознаграждения (BAS). Мозг острее реагирует на награду, заставляя амбиции казаться важнее отдыха. Это дофаминовый скачок, скрывающий реальные риски." },
+            B: { status: "Ваша мотивация заморожена. Будущее туманно, риски пугают, а физической энергии не хватает на базовые вещи.", science: "Связано с дефицитом серотонина и дофамина в синапсах. Нежелание действовать — это биологическое снижение активности центров предвкушения радости, а не слабость характера." },
+            C: { status: "Ваша система вознаграждения работает без острых перекосов. Вы ставите цели, соразмерные ресурсам.", science: "Согласованность между желаниями и возможностями говорит о том, что нервная система находится в состоянии устойчивого равновесия." }
+        },
+        axis3: {
+            title: "Ось 3: Ядро идентичности (Связь с ценностями)",
+            A: { status: "Вам кажется, что старые рамки тесны, а прошлые правила нужно пересмотреть или отбросить.", science: "Это «эффект состояния» (State Effect). В периоды эмоционального разгона мозг подменяет многолетние ценности сиюминутными порывами. Ваше подлинное «Я» заглушено химической бурей." },
+            B: { status: "Вы чувствуете себя оторванным от прошлого. Привычные ценности далеки, внутри ощущается пустота.", science: "Сильные спады временно блокируют доступ к эмоциональной памяти. То, что вам «ни до чего нет дела» — симптом истощения, а не стирание личности." },
+            C: { status: "Вы чувствуете связь со своим прошлым опытом и опираетесь на привычные жизненные константы.", science: "Исследования (проект STEP-BD) доказывают, что базовые черты личности остаются стабильными. Сейчас вы в хорошем контакте со своим аутентичным характером." }
+        }
+    };
+
+    let currentStep = 0;
+    const answers = [];
+
+    function startQuiz() {
+        document.getElementById('screen-intro').classList.remove('active');
+        document.getElementById('progressWrapper').style.display = 'block';
+        renderQuestion(0);
+    }
+
+    function renderQuestion(index) {
+        const container = document.getElementById('quiz-container');
+        const q = questions[index];
+        
+        let html = `
+            <div id="screen-q${index}" class="screen active">
+                <img src="${q.image}" alt="Абстрактная визуализация вопроса" class="q-image" onerror="this.style.display='none'">
+                <h2>${q.text}</h2>
+        `;
+        
+        q.options.forEach(opt => {
+            html += `<div class="card" onclick="selectAnswer(this, '${opt.value}', ${index})">${opt.text}</div>`;
+        });
+        
+        html += `</div>`;
+        container.innerHTML = html;
+        updateProgress();
+    }
+
+    function selectAnswer(element, value, index) {
+        // Подсветка выбранной карточки
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+        element.classList.add('selected');
+        
+        answers[index] = value;
+        
+        // Задержка перед переходом для плавности UX
+        setTimeout(() => {
+            currentStep++;
+            if (currentStep < questions.length) {
+                renderQuestion(currentStep);
+            } else {
+                showLoading();
+            }
+        }, 400);
+    }
+
+    function updateProgress() {
+        const progress = ((currentStep) / questions.length) * 100;
+        document.getElementById('progressBar').style.width = `${progress}%`;
+    }
+
+    function showLoading() {
+        document.getElementById('quiz-container').innerHTML = '';
+        document.getElementById('progressWrapper').style.display = 'none';
+        document.getElementById('screen-loading').classList.add('active');
+        
+        setTimeout(() => {
+            calculateResults();
+        }, 3000);
+    }
+
+    function calculateResults() {
+        document.getElementById('screen-loading').classList.remove('active');
+        
+        // Ось 1 (Вопросы 0, 1)
+        const axis1Ans = [answers[0], answers[1]];
+        let res1 = getMajorityOrC(axis1Ans);
+
+        // Ось 2 (Вопросы 2, 4, 5)
+        const axis2Ans = [answers[2], answers[4], answers[5]];
+        let res2 = getMajorityOrC(axis2Ans);
+
+        // Ось 3 (Вопросы 3, 6)
+        const axis3Ans = [answers[3], answers[6]];
+        let res3 = getMajorityOrC(axis3Ans);
+
+        renderResultBlock('axis1', res1);
+        renderResultBlock('axis2', res2);
+        renderResultBlock('axis3', res3);
+
+        document.getElementById('screen-results').classList.add('active');
+    }
+
+    // Вспомогательная функция для логики (если ничья или есть С - тяготеем к балансу С)
+    function getMajorityOrC(arr) {
+        const counts = { A: 0, B: 0, C: 0 };
+        arr.forEach(ans => counts[ans]++);
+        
+        if (counts.A > counts.B && counts.A > counts.C) return 'A';
+        if (counts.B > counts.A && counts.B > counts.C) return 'B';
+        return 'C'; // Если ничья или преобладает С
+    }
+
+    function renderResultBlock(axis, val) {
+        const data = resultTexts[axis];
+        const resData = data[val];
+        
+        const html = `
+            <div class="result-block">
+                <h3>${data.title}</h3>
+                <p><strong>Результат:</strong> ${resData.status}</p>
+                <div class="science-fact">🔬 ${resData.science}</div>
+            </div>
+        `;
+        document.getElementById('results-content').innerHTML += html;
+    }
+</script>
+</body>
+</html>
